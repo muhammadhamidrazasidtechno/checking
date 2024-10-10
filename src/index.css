@@ -5,7 +5,15 @@
   padding: 0;
   box-sizing: border-box;
 }
-
+.css-12luze3:last-of-type .MuiTableCell-root {
+  text-align: center !important;
+}
+.css-1sdvolp {
+  text-align: center !important;
+}
+.css-18ophu1 {
+  text-align: center !important;
+}
 .css-1fmncen-MuiTableHead-root .MuiTableCell-root {
   text-align: center !important;
 }
