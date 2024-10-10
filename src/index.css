@@ -1,0 +1,18 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.css-1fmncen-MuiTableHead-root .MuiTableCell-root {
+  text-align: center !important;
+}
+
+.css-1buty4o-MuiTableCell-root {
+  text-align: center !important;
+}
+.css-k5s3ec-MuiTableCell-root {
+  text-align: center !important;
+}
