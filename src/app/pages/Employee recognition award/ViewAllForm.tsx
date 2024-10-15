@@ -1,0 +1,141 @@
+import React, { useState } from "react";
+import {
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Box,
+} from "@mui/material";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import "./EmployeeRecognitionForm.css";
+import PdfDownloader from "../../../_metronic/layout/components/pdfDownloader";
+import UserTable from "../../../_metronic/layout/components/Table";
+import DetailsDialog from "../../../_metronic/layout/components/View";
+import Pagination from "../../modules/apps/user-management/users-list/components/pagination/Pagination";
+
+// Updated data structure with additional fields
+const RecognitionAll = [
+  {
+    name: "August Bailey",
+
+    id: 1,
+    sNo: 1,
+    employeeName: "John Doe",
+    position: "Software Engineer",
+    department: "Development",
+    nominationReason: "Exceeds performance expectations.",
+    nominatorName: "Jane Smith",
+    nominatorPhone: "123-456-7890",
+    nominatorDepartment: "HR",
+    nominatorSignature: "Jane Signature",
+    date: "2024-09-20",
+    supervisorName: "Alice Johnson",
+    supervisorDepartment: "Development",
+    supervisorPhone: "555-123-4567",
+    supervisorEndorsement: "Endorsed for excellent performance.",
+    jobPerformance: "Outstanding",
+  },
+  {
+    id: 2,
+    name: "Ahmed",
+
+    sNo: 2,
+    employeeName: "Jane Doe",
+    position: "Project Manager",
+    department: "Management",
+    nominationReason: "Outstanding leadership and project delivery.",
+    nominatorName: "Mark Johnson",
+    nominatorPhone: "098-765-4321",
+    nominatorDepartment: "Marketing",
+    nominatorSignature: "Mark Signature",
+    date: "2024-09-15",
+    supervisorName: "Tom Brown",
+    supervisorDepartment: "Management",
+    supervisorPhone: "555-765-4321",
+    supervisorEndorsement: "Highly recommended.",
+    jobPerformance: "Excellent",
+  },
+  // Add more entries as needed
+];
+
+type TableRow = [string, string]; // Tuple of two strings
+type TableRows = TableRow[]; // Array of TableRow
+
+const ViewAllRecognitionAll: React.FC = () => {
+  const [selectedNomination, setSelectedNomination] = useState<any>(null);
+  const [open, setOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const USERS_PER_PAGE = 5;
+  const totalPages = Math.ceil(RecognitionAll.length / USERS_PER_PAGE);
+  const handleDownload = (nomination: any) => {
+    const tableRows: TableRows = [
+      ["Employee Name", nomination.employeeName],
+      ["Position", nomination.position],
+      ["Department", nomination.department],
+      ["Nomination Reason", nomination.nominationReason],
+      ["Nominator Name", nomination.nominatorName],
+      ["Nominator Phone", nomination.nominatorPhone],
+      ["Nominator Department", nomination.nominatorDepartment],
+      ["Nominator Signature", nomination.nominatorSignature],
+      ["Date", nomination.date],
+      ["Supervisor Name", nomination.supervisorName],
+      ["Supervisor Department", nomination.supervisorDepartment],
+      ["Supervisor Phone", nomination.supervisorPhone],
+      ["Supervisor Endorsement", nomination.supervisorEndorsement],
+      ["Job Performance", nomination.jobPerformance],
+    ];
+
+    PdfDownloader({
+      tableRows,
+      heading: "Nomination Details",
+      saveName: `nomination_details`,
+    });
+  };
+
+  const handleView = (nomination: any) => {
+    setSelectedNomination(nomination);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedNomination(null);
+  };
+
+  return (
+    <Container>
+      <h1 className="h2mane">Recognition All</h1>
+      <span className="greenLine"></span>
+      <UserTable
+        users={RecognitionAll}
+        handleView={handleView}
+        handleDownload={handleDownload}
+      />
+
+      <DetailsDialog
+        open={open} // Control the dialog with the state
+        handleClose={handleClose} // Properly close the dialog
+        complaint={selectedNomination} // Pass the selected complaint,
+        heading="Nomination Details"
+      />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
+    </Container>
+  );
+};
+
+export default ViewAllRecognitionAll;
