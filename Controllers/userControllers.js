@@ -90,6 +90,8 @@ const registerUser = asyncHandler(async (req, res) => {
 import bcrypt from "bcryptjs"; // Assuming bcryptjs is installed
 
 const loginUser = asyncHandler(async (req, res) => {
+  console.time("LoginProcessTime");
+
   const { email, password, role } = req.body;
 
   // Check if email and password are provided
@@ -98,14 +100,14 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   // Check if the user exists
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("-password");
   if (!user) {
     throw new ApiError(404, "User does not exist");
   }
 
   // Verify if the provided password matches the hashed password
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
-  console.log(isPasswordCorrect);
+  console.log("Password Match:", isPasswordCorrect);
 
   if (!isPasswordCorrect) {
     throw new ApiError(401, "Incorrect password");
@@ -124,7 +126,7 @@ const loginUser = asyncHandler(async (req, res) => {
   // Generate an access token
   const accessToken = user.TokenGenerate();
 
-  // Add the token and update the login date
+  // Update the login date and token
   userDetail.token.push(accessToken);
   userDetail.last_login = new Date();
   userDetail.currentToken = accessToken;
@@ -139,6 +141,7 @@ const loginUser = asyncHandler(async (req, res) => {
   };
 
   // Return user details and set cookies
+  console.timeEnd("LoginProcessTime");
   return res
     .cookie("token", accessToken, options)
     .cookie("islogin", true, options)
