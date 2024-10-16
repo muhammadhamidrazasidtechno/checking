@@ -5,10 +5,13 @@ import UserRouter from "./Routes/userRouters.js";
 import CompetencyEvaluationFormRouter from "./Routes/CompetencyEvaluationFormRouter.js";
 
 const app = express();
+
+// CORS configuration (specify allowed origins in production)
 app.use(
   cors({
-    origin: "*", // Allows access from any origin
-    credentials: true, // Allows credentials to be sent with requests
+    origin:
+      process.env.NODE_ENV === "production" ? "your-production-url.com" : "*",
+    credentials: true,
   })
 );
 
@@ -18,10 +21,15 @@ app.use("/uploads", express.static("uploads"));
 
 app.use(cookieParser());
 
+// Define routes
 app.use("/api/v1/user", UserRouter);
-app.use(
-  "/api/v1/CompetencyEvaluationFormRouter",
-  CompetencyEvaluationFormRouter
-);
+app.use("/api/v1/competency-evaluation", CompetencyEvaluationFormRouter);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal Server Error" });
+});
+
+// Export app
 export { app };
