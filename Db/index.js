@@ -3,7 +3,7 @@ import { DB_NAME } from "../constants.js";
 
 async function DatabaseConnection() {
   try {
-    await mongoose.connect(`${process.env.MONGODB_URI}${DB_NAME}`);
+   mongoose.connect(`${process.env.MONGODB_URI}${DB_NAME}`);
 
     console.log("app is listen on process.env.PORT");
   } catch (e) {
