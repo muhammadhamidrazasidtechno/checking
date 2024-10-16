@@ -87,45 +87,65 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // Login user
+import bcrypt from "bcryptjs"; // Assuming bcryptjs is installed
+
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password, role } = req.body;
 
+  // Check if email and password are provided
   if (!email || !password) {
-    throw new ApiError(400, "Username or password required");
+    throw new ApiError(400, "Email and password are required");
   }
 
+  // Check if the user exists
   const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError(404, "User does not exist");
   }
 
-  const isPasswordCorrect = user.password == password;
+  // Verify if the provided password matches the hashed password
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
   console.log(isPasswordCorrect);
 
   if (!isPasswordCorrect) {
-    throw new ApiError(401, "Password does not match");
+    throw new ApiError(401, "Incorrect password");
   }
 
-  if (role !== user.role) {
+  // Verify if the provided role matches the user's role
+  if (role && role !== user.role) {
     throw new ApiError(401, "Role does not match");
   }
 
+  // Retrieve user details excluding password and refresh token
   const userDetail = await User.findById(user._id).select(
     "-password -refreshtoken"
   );
+
+  // Generate an access token
   const accessToken = user.TokenGenerate();
+
+  // Add the token and update the login date
   userDetail.token.push(accessToken);
   userDetail.last_login = new Date();
   userDetail.currentToken = accessToken;
+
   await userDetail.save();
 
-  const options = { httpOnly: true, secure: true };
+  // Set cookies (configure secure flag based on environment)
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Set secure flag for production
+    sameSite: "strict", // Prevent CSRF
+  };
+
+  // Return user details and set cookies
   return res
     .cookie("token", accessToken, options)
     .cookie("islogin", true, options)
     .status(200)
     .json(formatUserResponse(userDetail));
 });
+
 
 // Verify token
 const verifyToken = asyncHandler(async (req, res) => {
