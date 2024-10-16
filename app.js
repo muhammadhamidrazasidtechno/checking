@@ -10,7 +10,7 @@ const app = express();
 app.use(
   cors({
     origin:
-      process.env.NODE_ENV === "production" ? "your-production-url.com" : "*",
+      process.env.NODE_ENV === "production" ? "*" : "*",
     credentials: true,
   })
 );
